@@ -125,8 +125,9 @@ systemctl start openqa-webui
   \lstset{style=mybash}
   \begin{lstlisting}
     cp $ISO /var/lib/openqa/factory/iso
-    export PATH=$PATH:/usr/share/openqa/tools
-    rpc.pl --host localhost iso_new $ISO
+    ./script/client --host localhost:9526 \
+      --key $KEY --secret $SECRET \
+      isos post iso=openSUSE-13.1-DVD-x86_64-Build0091-Media.iso
   \end{lstlisting}
 
   ... and start the workers.
@@ -153,12 +154,14 @@ systemctl start openqa-webui
 \begin{frame}[fragile]
   \frametitle{Running a Test}
   \begin{itemize}
-  \item Go to the http://localhost/
+  \item Go to http://localhost:9526/
   \item Cancel all the test except KDE
-  \item Launch in a terminal a new worker
+  \item Launch in a terminal a new worker (if there is none via systemd)
     \lstset{style=mybash}
     \begin{lstlisting}
-      worker --host localhost --instance 1
+      ./script/worker --host localhost:9526 --instance 1 \
+        --isotovideo=PATH_TO_isotovideo \
+        --key $KEY --secret $SECRET
     \end{lstlisting}
   \item Refresh and see the test running
   \item You can connect via VNC
