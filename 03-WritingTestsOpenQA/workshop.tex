@@ -99,33 +99,18 @@
   \item You can install from packages:
     \lstset{style=mybash}
     \begin{lstlisting}
-      OOR=http://download.opensuse.org/repositories
-      URI=$OOR/devel:openQA/openSUSE_13.1
-      zypper ar $URI devel:openQA
-      zypper in openQA kvm OVMF
+zypper ar -f obs://devel:openQA/openSUSE_13.1 openQA
+zypper ar -f obs://devel:openQA:devel/openSUSE_13.1 openQA-devel
+zypper ar -f obs://devel:openQA:devel:13.1/openSUSE_13.1 openQA-devel-perl-modules
+zypper in openQA
+# Init database
+/usr/share/openqa/script/initdb --init_database
+# Start WebUI
+systemctl start openqa-webui
     \end{lstlisting}
-    
+  \item You can find more details here\newline
+    \url{http://download.opensuse.org/factory/iso/}
   \end{itemize}
-  Add the devel:openQA repository and install openQA ...
-  \lstset{style=mybash}
-  \begin{lstlisting}
-    OOR=http://download.opensuse.org/repositories
-    URI=$OOR/devel:openQA/openSUSE_13.1
-    zypper ar $URI devel:openQA
-    zypper ref devel:openQA
-    zypper in openQA kvm OVMF
-    # Create the pool directory
-    /usr/lib/os-autoinst/tools/preparepool 2
-    reboot
-  \end{lstlisting}
-
-  ... install needles ...
-  \lstset{style=mybash}
-  \begin{lstlisting}
-    /usr/lib/os-autoinst/tools/fetchneedles
-    cd /var/lib/os-autoinst/needles
-    sudo chown -R wwwrun distri
-  \end{lstlisting}
 \end{frame}
 
 %
