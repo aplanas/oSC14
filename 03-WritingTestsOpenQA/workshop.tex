@@ -117,14 +117,14 @@ systemctl start openqa-webui
   \frametitle{Test the Installation}
   Download the ISO from
   \url{http://download.opensuse.org/factory/iso/}\newline
+  and save to \texttt{/var/lib/openqa/factory/iso}
 
   Register the ISO ...
   \lstset{style=mybash}
   \begin{lstlisting}
-    cp $ISO /var/lib/openqa/factory/iso
-    ./script/client --host localhost:9526 \
-      --key $KEY --secret $SECRET \
-      isos post iso=openSUSE-13.1-DVD-x86_64-Build0091-Media.iso
+/usr/share/openqa/script/client --host localhost:9526 \
+  --key $KEY --secret $SECRET \
+  isos post iso=openSUSE-13.1-DVD-x86_64-Build0091-Media.iso
   \end{lstlisting}
 
   ... and start the workers.
