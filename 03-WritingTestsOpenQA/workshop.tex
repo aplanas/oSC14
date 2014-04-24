@@ -67,17 +67,12 @@
 % Overview
 %
 \begin{frame}{Overview}
-  With openQA we can test the installation process of a distribution.
+  In this workshop we will ...
   \begin{itemize}
-  \item We provide the tests (Perl code)
-  \item We provide the ISO image
-  \item A worker will launch an instance of os-autoinst
-  \item os-autoinst create the environment
-    \begin{itemize}
-    \item Environment variables
-    \item HDD images
-    \end{itemize}
-  \item ... and run the tests
+    \item install and run openQA
+    \item run tests for openSUSE
+    \item learn how to create or modify reference images
+    \item learn how to create tests
   \end{itemize}
 \end{frame}
 
@@ -101,12 +96,57 @@
     \begin{lstlisting}
 zypper ar -f obs://devel:openQA/openSUSE_13.1 openQA
 zypper ar -f obs://devel:openQA:13.1/openSUSE_13.1 openQA-perl-modules
-zypper in openQA
+zypper in openQA apache2
 # Start WebUI
 systemctl start openqa-webui
     \end{lstlisting}
   \item More detailed instructions at \newline
     \url{https://github.com/os-autoinst/openQA}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Apache Setup}
+  \begin{itemize}
+    \item use default vhost template
+    \lstset{style=mybash}
+    \begin{lstlisting}
+cp /etc/apache2/vhosts.d/openqa.conf.template \
+   /etc/apache2/vhosts.d/openqa.conf
+    \end{lstlisting}
+\item enable apache modules and restart apache
+    \begin{lstlisting}
+a2enmod headers
+a2enmod proxy
+a2enmod proxy_http
+# (re)start apache
+rcapache2 restart
+    \end{lstlisting}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Generate Secrets for Authentication}
+  \begin{itemize}
+    \item first, switch off https by editing \texttt{/etc/openqa/openqa.ini}
+    \begin{lstlisting}
+[openid]
+httpsonly = 0
+    \end{lstlisting}
+    \item go to \url{http://localhost/} and log in
+    \item go to Admin -> Secrets and generate a pair of key+secret
+    \item edit \texttt{/etc/openqa/client.conf} and put key and secret there
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{fetch tests and reference images}
+  \begin{itemize}
+    \item the \texttt{fetchneedles} tool can be used to clone from github
+    \lstset{style=mybash}
+    \begin{lstlisting}
+/usr/lib/os-autoinst/tools/fetchneedles --shallow
+    \end{lstlisting}
   \end{itemize}
 \end{frame}
 
@@ -122,24 +162,16 @@ systemctl start openqa-webui
   Register the ISO ...
   \lstset{style=mybash}
   \begin{lstlisting}
-/usr/share/openqa/script/client --host localhost:9526 \
-  --key $KEY --secret $SECRET \
+/usr/share/openqa/script/client --host localhost \
   isos post iso=openSUSE-13.1-DVD-x86_64-Build0091-Media.iso
   \end{lstlisting}
 
-  ... launch the application ...
+  ... and start one worker.
   \lstset{style=mybash}
   \begin{lstlisting}
-    vi openqa.ini
-    morbo script/openqa
-  \end{lstlisting}
-
-  ... and start the workers.
-  \lstset{style=mybash}
-  \begin{lstlisting}
-    systemctl start openqa-worker.target
-    # You can control every worker manually:
-    # systemctl start openqa-worker@1.service
+    systemctl start openqa-worker@1.service
+    # You can start all workers at once using
+    # systemctl start openqa-worker.target
   \end{lstlisting}
 \end{frame}
 
@@ -158,17 +190,10 @@ systemctl start openqa-webui
 \begin{frame}[fragile]
   \frametitle{Running a Test}
   \begin{itemize}
-  \item Go to http://localhost:9526/
+  \item Go to \url{http://localhost/tests}
   \item Cancel all the test except KDE
-  \item Launch in a terminal a new worker (if there is none via systemd)
-    \lstset{style=mybash}
-    \begin{lstlisting}
-      ./script/worker --host localhost:9526 --instance 1 \
-        --isotovideo=PATH_TO_isotovideo \
-        --key $KEY --secret $SECRET
-    \end{lstlisting}
   \item Refresh and see the test running
-  \item You can connect via VNC
+  \item You can connect to the worker via VNC
     \lstset{style=mybash}
     \begin{lstlisting}
       vncviewer localhost:91
@@ -265,7 +290,7 @@ systemctl start openqa-webui
 % API
 %
 \begin{frame}{Variables}
-  Check the variables to see in what configuration are you
+  Check the variables to see in what configuration you are
   \begin{itemize}
   \item DESKTOP = kde | gnome | lxde | minimalx ...
   \item USBBOOT | LIVETEST | NETBOOT
@@ -300,13 +325,13 @@ systemctl start openqa-webui
 \begin{frame}{Directory layout}
   Two important directories:
   \begin{itemize}
-  \item Tests: /usr/lib/os-autoinst/distri/opensuse
+  \item Tests: /usr/lib/os-autoinst/tests/opensuse
     \begin{itemize}
     \item Installation tests: inst.d
     \item Console tests: consoletest.d
     \item Application tests: x11test.d
     \end{itemize}
-  \item Needles: /usr/lib/os-autoinst/distri/opensuse/needles
+  \item Needles: /usr/lib/os-autoinst/tests/opensuse/needles
   \end{itemize}
 \end{frame}
 
@@ -494,3 +519,5 @@ systemctl start openqa-webui
 \end{frame}
 
 \end{document}
+
+% vim: et sw=2

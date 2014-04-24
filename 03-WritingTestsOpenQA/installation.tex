@@ -1,0 +1,70 @@
+%
+% Installation
+%
+\begin{frame}[fragile]
+  \frametitle{Installation}
+  \begin{itemize}
+  \item install packages
+    \lstset{style=mybash}
+    \begin{lstlisting}
+zypper ar -f obs://devel:openQA/openSUSE_13.1 openQA
+zypper ar -f obs://devel:openQA:13.1/openSUSE_13.1 \
+  openQA-perl-modules
+zypper in openQA apache2
+    \end{lstlisting}
+    \item start web interface
+    \begin{lstlisting}
+systemctl start openqa-webui
+    \end{lstlisting}
+  \item More detailed instructions at \newline
+    \url{https://github.com/os-autoinst/openQA}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Apache Setup}
+  \begin{itemize}
+    \item use default vhost template
+    \lstset{style=mybash}
+    \begin{lstlisting}
+cp /etc/apache2/vhosts.d/openqa.conf.template \
+   /etc/apache2/vhosts.d/openqa.conf
+    \end{lstlisting}
+\item enable required apache modules
+    \begin{lstlisting}
+a2enmod headers
+a2enmod proxy
+a2enmod proxy_http
+    \end{lstlisting}
+    \item (re)start apache
+    \begin{lstlisting}
+rcapache2 restart
+    \end{lstlisting}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Generate Secrets for Authentication}
+  \begin{itemize}
+    \item switch off https in \texttt{/etc/openqa/openqa.ini}
+    \begin{lstlisting}
+[openid]
+httpsonly = 0
+    \end{lstlisting}
+    \item go to \url{http://localhost/} and log in
+    \item go to Admin -> Secrets and generate a pair of key+secret
+    \item edit \texttt{/etc/openqa/client.conf} and put key and secret there
+  \end{itemize}
+\end{frame}
+
+% opensuse specific, we have dsl as example later though
+%\begin{frame}[fragile]
+%  \frametitle{fetch tests and reference images}
+%  \begin{itemize}
+%    \item the \texttt{fetchneedles} tool gets openSUSE data from github
+%    \lstset{style=mybash}
+%    \begin{lstlisting}
+%/usr/lib/os-autoinst/tools/fetchneedles
+%    \end{lstlisting}
+%  \end{itemize}
+%\end{frame}
