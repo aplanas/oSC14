@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 0,
+      "ypos": 0,
+      "width": 721,
+      "height": 400,
+      "type": "match"
+    }
+  ],
+  "tags": [
+    "nano",
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US"
+  ]
+}

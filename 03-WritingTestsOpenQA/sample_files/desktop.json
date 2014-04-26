@@ -1,0 +1,17 @@
+{
+  "tags": [
+    "desktop",
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US"
+  ],
+  "area": [
+    {
+      "xpos": 0,
+      "ypos": 0,
+      "width": 205,
+      "height": 191,
+      "type": "match"
+    }
+  ]
+}

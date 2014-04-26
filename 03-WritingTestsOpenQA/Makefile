@@ -1,4 +1,4 @@
-ELEMENTNAME=workshop
+ELEMENTNAME=workshop2
 
 all: doc clean
 

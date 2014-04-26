@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 0,
+      "ypos": 323,
+      "width": 130,
+      "height": 79,
+      "type": "match"
+    }
+  ],
+  "tags": [
+    "recharge-done",
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US"
+  ]
+}

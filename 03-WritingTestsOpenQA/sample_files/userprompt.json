@@ -1,0 +1,17 @@
+{
+  "tags": [
+    "userprompt",
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US"
+  ],
+  "area": [
+    {
+      "xpos": 0,
+      "ypos": 379,
+      "width": 124,
+      "height": 20,
+      "type": "match"
+    }
+  ]
+}

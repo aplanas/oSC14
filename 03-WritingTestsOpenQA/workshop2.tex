@@ -33,7 +33,7 @@
 
 
 \setbeamerfont{title}{series=\bfseries,size=\LARGE}
-\author{Alberto Planas <aplanas@suse.de>\newline {\small openSUSE Team}}
+\author{Alberto Planas,\newline Ludwig Nussel\newline {\tiny SUSE Linux Products GmbH}}
 \title{openQA Workshop -- oSC14}
 \subtitle{Learning how to make tests with openQA}
 
@@ -64,76 +64,63 @@
 
 \section{Introduction}
 %
-% Overview
-%
-\begin{frame}{Overview}
-  In this workshop we will ...
-  \begin{itemize}
-    \item install and run openQA
-    \item run tests for openSUSE
-    \item learn how to create or modify reference images
-    \item learn how to create tests
-  \end{itemize}
-\end{frame}
-
-%
 % Architecture
 %
 \begin{frame}{Architecture}
   \includegraphics[height=5.8cm,width=10.3cm]{arch}
 \end{frame}
 
+%
+% Overview
+%
+\begin{frame}{Overview}
+  In this workshop we will ...
+  \begin{itemize}
+    \item start with testing a small live distro
+    \item learn how to create or modify reference images
+    \item learn how to create tests
+  \end{itemize}
+\end{frame}
 
 \section{Installation}
+%
+% Installation
+%
+%\begin{frame}[fragile]
+%  \frametitle{Installation}
+%  TODO: add ancor's slide
+%\end{frame}
+
 \input{installation.tex}
 
+%\begin{frame}{Screenshot}
+%  \includegraphics[height=6.2cm,width=10.88cm]{screenshot}
+%\end{frame}
 %
-% Test the Installation
-%
-\begin{frame}[fragile]
-  \frametitle{Test the Installation}
-  Download the ISO from
-  \url{http://download.opensuse.org/factory/iso/}\newline
-  and save to \texttt{/var/lib/openqa/factory/iso}
-
-  Register the ISO ...
-  \lstset{style=mybash}
-  \begin{lstlisting}
-/usr/share/openqa/script/client --host localhost \
-  isos post iso=openSUSE-13.1-DVD-x86_64-Build0091-Media.iso
-  \end{lstlisting}
-
-  ... and start one worker.
-  \lstset{style=mybash}
-  \begin{lstlisting}
-    systemctl start openqa-worker@1.service
-    # You can start all workers at once using
-    # systemctl start openqa-worker.target
-  \end{lstlisting}
-\end{frame}
-
-%
-% Screen-shot of openQA
-%
-\begin{frame}{Screenshot}
-  \includegraphics[height=6.2cm,width=10.88cm]{screenshot}
-\end{frame}
-
 
 \section{openQA Usage}
 %
 % Running a Test
 %
 \begin{frame}[fragile]
-  \frametitle{Running a Test}
+  \frametitle{Pick some small distro to practice with}
   \begin{itemize}
-  \item Go to \url{http://localhost/tests}
-  \item Cancel all the test except KDE
-  \item Refresh and see the test running
-  \item You can connect to the worker via VNC
+  \item download SliTaz
     \lstset{style=mybash}
     \begin{lstlisting}
-      vncviewer localhost:91
+wget -P /var/lib/openqa/factory/iso \
+  http://mirror.slitaz.org/iso/4.0/ \
+  slitaz-4.0.iso
+    \end{lstlisting}
+  \item clone template repo for distro
+    \lstset{style=mybash}
+    \begin{lstlisting}
+cd /var/lib/os-autoinst/tests
+sudo -u geekotest \
+  git clone git://github.com/os-autoinst/ \
+  os-autoinst-distri-example.git slitaz
+ln -s /var/lib/os-autoinst/tests/slitaz \
+  /usr/lib/os-autoinst/distri/
     \end{lstlisting}
   \end{itemize}
 \end{frame}
@@ -141,13 +128,22 @@
 %
 % Exercise 1
 %
-\begin{frame}{Exercise 1 -- Testing an ISO}
+\begin{frame}[fragile]{Exercise 1 -- Testing an ISO}
   \begin{enumerate}
-  \item Use Build0575 to test a good ISO
-  \item Register the ISO in the system
-  \item Remove all jobs except the KDE one
-  \item Launch only one worker
-  \item Wait until fails!
+  \item Create a job for the ISO
+    \lstset{style=mybash}
+    \begin{lstlisting}
+/usr/share/openqa/script/client jobs post \
+  DISTRI=slitaz VERSION=4.0 ARCH=i586 \
+  TEST=foo MACHINE=bar NICMODEL=e1000 \
+  DESKTOP=default ISO=slitaz-4.0.iso
+    \end{lstlisting}
+  \item Launch one worker
+    \lstset{style=mybash}
+    \begin{lstlisting}
+systemctl start openqa-worker@1.service
+    \end{lstlisting}
+  \item Watch in the web UI live until it fails!
   \end{enumerate}
 \end{frame}
 
@@ -155,13 +151,12 @@
 % Test Failed
 %
 \begin{frame}{Test Failed}
-  So... the test failed. Let see what happen.
+  So... the test failed. Let's see what happened.
   \begin{itemize}
   \item Go to the result view
-  \item Select the failed test
-  \item Use the screenshot to check the image
-  \item A real bug in Factory?
-  \item If not, create a needle!
+  \item Click on the thumbnail of the failed test
+  \item Check the screenshot
+  \item Check the "Source code" tab to see the test code
   \end{itemize}
 \end{frame}
 
@@ -203,10 +198,11 @@
 %
 \begin{frame}{Exercise 2 -- Create a Needle}
   \begin{enumerate}
-  \item Go to the result page
+  \item Restart the test and open the new job
+  \item Set the job to interactive mode
+  \item Stop the test when it's at the bootloader
   \item Create a needle in the failing test
-  \item Be careful with the TAGs!
-  \item Relaunch the job and repeat the operation if needed
+  \item Be careful with the Tags!
   \end{enumerate}
 \end{frame}
 
@@ -215,63 +211,36 @@
 %
 % Exercise 3
 %
-\begin{frame}{Exercise 3 -- Analyze a Test}
+\begin{frame}{Exercise 3 -- Modify a Test}
   \begin{enumerate}
-  \item Use rpm -ql os-autoinst to find where are the tests
-  \item Find the opensuse one and see the directories
-  \item Read the ooffice test and figure out what is doing
+  \item Tests are in \texttt{/var/lib/os-autoinst/tests}
+  \item Find the slitaz ones and have a look at the directories
+  \begin{itemize}
+    \item Test driver: \texttt{main.pm}
+    \item Actual tests: \texttt{test.d}
+    \item Needles: \texttt{needles}
+  \end{itemize}
+  \item Open the boot test, figure out what is doing and modify it
   \end{enumerate}
 \end{frame}
+
+\begin{frame}[fragile]{Modified Test}
+    \begin{lstlisting}
++    waitforneedle( "language", 30 );
++    sendkey "ret";
++
++    waitforneedle( "keyboard", 30 );
++    sendkey "ret";
++
++    waitforneedle( "keyboard_text", 30 );
++    sendkey "ret";
+    \end{lstlisting}
+\end{frame}
+
 
 %
 % API
 %
-\begin{frame}{Variables}
-  Check the variables to see in what configuration you are
-  \begin{itemize}
-  \item DESKTOP = kde | gnome | lxde | minimalx ...
-  \item USBBOOT | LIVETEST | NETBOOT
-  \item BTRFS | ENCRYPT | LVM | RAIDLEVEL
-  \item UEFI
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{API for Input}
-  Sending events to the VM
-  \begin{itemize}
-  \item \texttt{sendkey "alt-n";} -- Send a keystroke
-  \item \texttt{sendkey \$cmd\{"next"\};} -- Use the \texttt{\$cmd\{\}} map for shortcuts
-  \item \texttt{sendautotype "string";} -- Send a set of keys
-  \item \texttt{sendautotype("string", 3);}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{API for Needles}
-  Sending events to the VM
-  \begin{itemize}
-  \item \texttt{waitforneedle("tag", 1);} -- Assert for a needle that have this tag
-  \item \texttt{checkneedle("tag", 1);} -- Return true is the needle is present
-  \item \texttt{\$self->check\_screen;} -- Assert using a synthetic tag name (\texttt{test-\$testname-\$count})
-  \item \texttt{\$self->take\_screenshot;} -- Do not assert. Journal for the test
-  \end{itemize}
-\end{frame}
-
-%
-% Directory layout
-%
-\begin{frame}{Directory layout}
-  Two important directories:
-  \begin{itemize}
-  \item Tests: /usr/lib/os-autoinst/tests/opensuse
-    \begin{itemize}
-    \item Installation tests: inst.d
-    \item Console tests: consoletest.d
-    \item Application tests: x11test.d
-    \end{itemize}
-  \item Needles: /usr/lib/os-autoinst/tests/opensuse/needles
-  \end{itemize}
-\end{frame}
-
 %
 % Anatomy of a test
 %
@@ -294,6 +263,38 @@
     \end{lstlisting}
 \end{frame}
 
+
+\begin{frame}{Variables}
+  Typcial variables available in openSUSE
+  \begin{itemize}
+  \item DESKTOP = kde | gnome | lxde | minimalx ...
+  \item DISTRI | VERSION | ARCH | TEST | MACHINE
+  \item USBBOOT | LIVETEST | NETBOOT
+  \item BTRFS | ENCRYPT | LVM | RAIDLEVEL
+  \item UEFI
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{API for Input}
+  Sending events to the VM
+  \begin{itemize}
+  \item \texttt{sendkey "alt-n";} -- Send a keystroke
+  \item \texttt{sendkey \$cmd\{"next"\};} -- Use the \texttt{\$cmd\{\}} map for shortcuts
+  \item \texttt{sendautotype "string";} -- Send a set of keys
+  \item \texttt{sendautotype("string", 3);}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{API for Needles}
+  Sending events to the VM
+  \begin{itemize}
+  \item \texttt{waitforneedle("tag", 1);} -- Assert needle with this tag
+  \item \texttt{checkneedle("tag", 1);} -- Return needle if needle found
+  \item \texttt{\$self->check\_screen;} -- Assert using a synthetic tag name (\texttt{test-\$testname-\$count})
+  \item \texttt{\$self->take\_screenshot;} -- Do not assert. Journal for the test
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]
   \frametitle{Anatomy of a Test II}
     \lstset{style=myperl}
@@ -311,8 +312,8 @@
 \begin{frame}{Test Flags}
   With the tests flags we control the behavior of the test if it fails.
   \begin{itemize}
-  \item \texttt{\{ 'fatal'=>1 \}} -- If fails, the test suite fails
-  \item \texttt{\{ 'important'=>1 \}} -- If fails, the overall state fails. Factory is broken
+  \item \texttt{\{ 'fatal'=>1 \}} -- If fails, the test suite stops in failed state
+  \item \texttt{\{ 'important'=>1 \}} -- If fails, the overall state fails. ISO considered broken
   \item \texttt{\{ 'milestone'=>1 \}} -- If ok, generate a new 'lastgood' snapshot
   \item \texttt{\{ \}} -- If fails, recover the 'lastgood' snapshot and continue to the next test
   \end{itemize}
@@ -322,56 +323,51 @@
 %
 % Exercise 4
 %
-\begin{frame}{Exercise 4 -- A test for Okular}
+\begin{frame}{Exercise 4 -- A test for nano}
+  Problem: SliTaz has not default keyboard bindings
   \begin{enumerate}
-  \item Create a test for okular
-  \item ... or evince 
+  \item Create a test for nano
+  \item switch to text console
+  \item log in as root (password root)
+  \item launch nano
+  \item exit it again
   \end{enumerate}
 \end{frame}
 
 
 \begin{frame}[fragile]
-  \frametitle{A test for Okular}
-  This is an application test
+  \frametitle{The test for nano}
   \lstset{style=myperl}
   \begin{lstlisting}
-    use base "basetest";
-    use strict;
-    use bmwqemu;
-
-    sub is_applicable() {
-      return $ENV{DESKTOP} eq "kde";
-    }
-
-    sub run() {
-      my $self=shift;
-      sendkey "alt-f2"; sendautotype "okular";
-      sendkey "ret"; waitforneedle("okular", 5);
-      sendkey "alt-f4"; sendkey "ret";
-    }
-
-    1;
+sub run {
+    sendkey "ctrl-alt-f1";
+    waitforneedle( "console", 30 );
+    sendautotype "root\n";
+    sendautotype "root\n";
+    sendautotype "nano\n";
+    waitforneedle( "nano", 30 );
+}
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{A test for Okular -- Sleeping}
-  But is not working!! -- We need to sleep.
-  \lstset{style=myperl}
-  \begin{lstlisting}
-    [...]
-    sub run() {
-      my $self=shift;
-      sendkey "alt-f2"; sleep 2;
-      sendautotype "okular"; sleep 2;
-      sendkey "ret"; sleep 2;
-      waitforneedle("okular", 5);
-      sendkey "alt-f4"; sleep 2;
-      sendkey "ret";
-    }
-    [...]
-  \end{lstlisting}
-\end{frame}
+%\begin{frame}[fragile]
+%  \frametitle{A test for Okular -- Sleeping}
+%  But is not working!! -- We need to sleep.
+%  \lstset{style=myperl}
+%  \begin{lstlisting}
+%    [...]
+%    sub run() {
+%      my $self=shift;
+%      sendkey "alt-f2"; sleep 2;
+%      sendautotype "okular"; sleep 2;
+%      sendkey "ret"; sleep 2;
+%      waitforneedle("okular", 5);
+%      sendkey "alt-f4"; sleep 2;
+%      sendkey "ret";
+%    }
+%    [...]
+%  \end{lstlisting}
+%\end{frame}
 
 \begin{frame}{API to Run Programs}
   We can hide the sleep command... a bit.
@@ -385,10 +381,22 @@
 %
 % Exercise 5
 %
+\begin{frame}{Exercise 5 -- install a package}
+  \begin{enumerate}
+    \item install the sudo package (\texttt{tazpkg get-install sudo})
+    \item exit the shell
+    \item log in as tux (no password)
+  \end{enumerate}
+\end{frame}
+
+
+%
+% Exercise 5
+%
 \begin{frame}{Exercise 5 -- The sudo Case}
   \begin{enumerate}
   \item From time to time we want to run a program with sudo
-  \item sudo can ask for a password, sometimes
+  \item sudo sometimes asks but not always
   \item Figure out how to resolve this problem with the current API
   \item If you are out of ideas, find the implementation and try to understand it
   \end{enumerate}
@@ -397,8 +405,7 @@
 
 \begin{frame}[fragile]
   \frametitle{The sudo Case}
-  With checkneedle we can add state into a test. This state is needed
-  to check when the terminal is asking for the root password.
+  Solution: checkneedle
   \lstset{style=myperl}
   \begin{lstlisting}
     sendautotype("sudo ls\n");
@@ -441,7 +448,7 @@
 \end{frame}
 
 
-\section{Endnote}
+\section{Questions?}
 
 \begin{frame}{Suse is hiring}
   \begin{figure}

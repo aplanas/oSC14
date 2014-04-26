@@ -1,0 +1,17 @@
+{
+  "tags": [
+    "sudo-install-done",
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US"
+  ],
+  "area": [
+    {
+      "xpos": 114,
+      "ypos": 347,
+      "width": 127,
+      "height": 23,
+      "type": "match"
+    }
+  ]
+}

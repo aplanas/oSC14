@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 29,
+      "ypos": 36,
+      "width": 474,
+      "height": 275,
+      "type": "match"
+    }
+  ],
+  "tags": [
+    "bootloader",
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US"
+  ]
+}

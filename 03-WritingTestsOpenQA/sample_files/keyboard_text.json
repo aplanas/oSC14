@@ -1,0 +1,17 @@
+{
+  "area": [
+    {
+      "xpos": 225,
+      "ypos": 64,
+      "width": 254,
+      "height": 58,
+      "type": "match"
+    }
+  ],
+  "tags": [
+    "ENV-DESKTOP-default",
+    "ENV-DISTRI-slitaz",
+    "ENV-INSTLANG-en_US",
+    "keyboard_text"
+  ]
+}
